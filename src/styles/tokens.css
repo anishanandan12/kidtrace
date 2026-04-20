@@ -1,0 +1,36 @@
+:root {
+  /* Colors */
+  --color-primary: #4caf50;
+  --color-primary-hover: #43a047;
+  --color-primary-subtle: #f1f8f1;
+  --color-primary-dot-dark: rgba(34, 120, 34, 0.32);
+  --color-accent: #f5a623;
+  --color-white: #ffffff;
+  --color-muted: #aaa;
+  --color-dot-light: rgba(255, 255, 255, 0.22);
+  --color-overlay: rgba(0, 0, 0, 0.35);
+
+  /* Typography */
+  --font-family: "Arial Rounded MT Bold", Arial, sans-serif;
+
+  /* Border radii */
+  --radius-card: 28px;
+  --radius-pill: 50px;
+  --radius-circle: 50%;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.18);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.25);
+
+  /* Spacing */
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 20px;
+  --space-lg: 32px;
+  --space-xl: 40px;
+
+  /* Component sizes */
+  --size-btn: 52px;
+  --size-canvas: min(82vw, 82vh);
+}

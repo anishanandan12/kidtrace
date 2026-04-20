@@ -1,0 +1,14 @@
+.bgDot {
+  position: absolute;
+  border-radius: var(--radius-circle);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.bgDotDark {
+  background: var(--color-primary-dot-dark);
+}
+
+.bgDotLight {
+  background: var(--color-dot-light);
+}
