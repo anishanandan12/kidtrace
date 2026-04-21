@@ -9,8 +9,8 @@
 
 .close-btn {
   position: absolute;
-  top: var(--space-md);
-  left: var(--space-md);
+  top: max(var(--space-md), env(safe-area-inset-top));
+  left: max(var(--space-md), env(safe-area-inset-left));
   width: var(--size-btn);
   height: var(--size-btn);
   border-radius: var(--radius-circle);
