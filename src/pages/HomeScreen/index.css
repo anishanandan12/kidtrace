@@ -5,7 +5,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--space-xl) var(--space-md);
+  padding: max(var(--space-xl), env(safe-area-inset-top)) var(--space-md)
+    max(var(--space-xl), env(safe-area-inset-bottom));
   position: fixed;
   inset: 0;
   overflow: hidden;
@@ -45,6 +46,17 @@
   .category-grid {
     grid-template-columns: 1fr;
     max-width: 300px;
+  }
+}
+
+@media (min-width: 768px) {
+  .category-grid {
+    max-width: 900px;
+    gap: var(--space-lg);
+  }
+
+  .category-card {
+    padding: var(--space-xl) var(--space-lg);
   }
 }
 
