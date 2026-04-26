@@ -398,7 +398,7 @@ Checklist:
 - [x] Remove `100vw` from fixed screens where `width: 100%` is enough.
 - [x] Add additive safe-area spacing around fixed controls.
 - [ ] Make completion UI independent from speech callbacks.
-- [ ] Add `pointercancel`/cancel handling for tracing.
+- [x] Add `pointercancel`/cancel handling for tracing.
 - [ ] Clamp canvas DPR to avoid oversized iPad canvases.
 - [ ] Wrap hover transforms in hover-capable media queries.
 - [ ] Document the minimum supported iOS Safari version.
