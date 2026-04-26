@@ -1,6 +1,11 @@
 .tracing-screen {
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: auto;
+  left: 0;
+  height: var(--app-height);
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -9,8 +14,8 @@
 
 .close-btn {
   position: absolute;
-  top: max(var(--space-md), env(safe-area-inset-top));
-  left: max(var(--space-md), env(safe-area-inset-left));
+  top: calc(var(--safe-area-top) + var(--space-md));
+  left: calc(var(--safe-area-left) + var(--space-md));
   width: var(--size-btn);
   height: var(--size-btn);
   border-radius: var(--radius-circle);
@@ -48,6 +53,10 @@
 .celebration-overlay {
   position: absolute;
   inset: 0;
+  padding: calc(var(--safe-area-top) + var(--space-md))
+    calc(var(--safe-area-right) + var(--space-md))
+    calc(var(--safe-area-bottom) + var(--space-md))
+    calc(var(--safe-area-left) + var(--space-md));
   background: var(--color-overlay);
   display: flex;
   align-items: center;
