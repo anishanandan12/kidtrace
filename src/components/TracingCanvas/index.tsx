@@ -7,7 +7,6 @@ import {
   scalePoints,
   smoothPoints,
 } from "../../utils/pathMath";
-import { unlockSpeech } from "../../utils/speech";
 import { drawPill, drawDirectionDots, drawChevron, drawTraceTip } from "../../utils/canvasDraw";
 
 const ORANGE = "#F5A623";
@@ -131,7 +130,6 @@ function TracingCanvas({ item, onComplete }: Props) {
 
   const handleStart = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
-      unlockSpeech();
       e.preventDefault();
       if (allDone || showCheck || currentStroke >= item.strokes.length) return;
       const canvas = canvasRef.current;

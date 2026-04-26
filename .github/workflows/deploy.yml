@@ -2,7 +2,10 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [master, develop]
+    branches:
+      - msster
+      - feature/*
+      - hotfix/*
 
 permissions:
   contents: read
