@@ -12,6 +12,7 @@ import { drawPill, drawDirectionDots, drawChevron, drawTraceTip } from "../../ut
 const ORANGE = "#F5A623";
 const GUIDE_COLOR = "rgba(0,0,0,0.22)";
 const COMPLETION_THRESHOLD = 0.85;
+const MAX_CANVAS_DPR = 2;
 
 interface Props {
   item: StrokeItem;
@@ -21,6 +22,7 @@ interface Props {
 function TracingCanvas({ item, onComplete }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lastItemRef = useRef<StrokeItem | null>(null);
+  const activePointerIdRef = useRef<number | null>(null);
   const [currentStroke, setCurrentStroke] = useState<number>(0);
   const [completedStrokes, setCompletedStrokes] = useState<number[]>([]);
   const [tracingProgress, setTracingProgress] = useState<number>(0);
@@ -37,6 +39,7 @@ function TracingCanvas({ item, onComplete }: Props) {
       setIsTracing(false);
       setShowCheck(false);
       setAllDone(false);
+      activePointerIdRef.current = null;
     }
   }, [item]);
 
@@ -114,24 +117,27 @@ function TracingCanvas({ item, onComplete }: Props) {
   }, [draw, currentStroke, completedStrokes, tracingProgress, showCheck]);
 
   const canvasPos = useCallback(
-    (
-      e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>,
-      canvas: HTMLCanvasElement,
-    ) => {
+    (e: React.PointerEvent<HTMLCanvasElement>, canvas: HTMLCanvasElement) => {
       const rect = canvas.getBoundingClientRect();
-      const src = "touches" in e ? (e.touches[0] ?? e.changedTouches[0]) : e;
       return {
-        x: ((src.clientX - rect.left) / rect.width) * canvas.width,
-        y: ((src.clientY - rect.top) / rect.height) * canvas.height,
+        x: ((e.clientX - rect.left) / rect.width) * canvas.width,
+        y: ((e.clientY - rect.top) / rect.height) * canvas.height,
       };
     },
     [],
   );
 
   const handleStart = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
       e.preventDefault();
-      if (allDone || showCheck || currentStroke >= item.strokes.length) return;
+      if (
+        activePointerIdRef.current !== null ||
+        allDone ||
+        showCheck ||
+        currentStroke >= item.strokes.length
+      ) {
+        return;
+      }
       const canvas = canvasRef.current;
       if (!canvas) return;
       const pos = canvasPos(e, canvas);
@@ -142,6 +148,8 @@ function TracingCanvas({ item, onComplete }: Props) {
       const startTol = Math.min(canvas.width, canvas.height) * 0.2;
       const d = Math.sqrt((pos.x - pts[0].x) ** 2 + (pos.y - pts[0].y) ** 2);
       if (d <= startTol) {
+        activePointerIdRef.current = e.pointerId;
+        canvas.setPointerCapture(e.pointerId);
         setIsTracing(true);
         setTracingProgress(0.02);
       }
@@ -150,9 +158,9 @@ function TracingCanvas({ item, onComplete }: Props) {
   );
 
   const handleMove = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
+      if (!isTracing || activePointerIdRef.current !== e.pointerId) return;
       e.preventDefault();
-      if (!isTracing) return;
       const canvas = canvasRef.current;
       if (!canvas) return;
       const pos = canvasPos(e, canvas);
@@ -171,9 +179,15 @@ function TracingCanvas({ item, onComplete }: Props) {
   );
 
   const handleEnd = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
+      if (activePointerIdRef.current !== e.pointerId) return;
       e.preventDefault();
       if (!isTracing) return;
+      const canvas = e.currentTarget;
+      if (canvas.hasPointerCapture(e.pointerId)) {
+        canvas.releasePointerCapture(e.pointerId);
+      }
+      activePointerIdRef.current = null;
       setIsTracing(false);
 
       if (tracingProgress >= COMPLETION_THRESHOLD) {
@@ -196,24 +210,58 @@ function TracingCanvas({ item, onComplete }: Props) {
     [item, onComplete, isTracing, tracingProgress, currentStroke, completedStrokes],
   );
 
+  const handleCancel = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (activePointerIdRef.current !== e.pointerId) return;
+    e.preventDefault();
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+    activePointerIdRef.current = null;
+    setIsTracing(false);
+    setTracingProgress(0);
+  }, []);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     let rafId = 0;
+
     const resize = () => {
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
-        const dpr = window.devicePixelRatio || 1;
+        const dpr = Math.min(window.devicePixelRatio || 1, MAX_CANVAS_DPR);
         const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
+        const nextWidth = Math.max(1, Math.round(rect.width * dpr));
+        const nextHeight = Math.max(1, Math.round(rect.height * dpr));
+
+        if (canvas.width !== nextWidth) {
+          canvas.width = nextWidth;
+        }
+        if (canvas.height !== nextHeight) {
+          canvas.height = nextHeight;
+        }
+
         draw(currentStroke, completedStrokes, tracingProgress, showCheck);
       });
     };
+
+    const observedElement = canvas.parentElement ?? canvas;
+    const resizeObserver = new ResizeObserver(resize);
+    const visualViewport = window.visualViewport;
+
+    resizeObserver.observe(observedElement);
     resize();
     window.addEventListener("resize", resize);
+    window.addEventListener("orientationchange", resize);
+    visualViewport?.addEventListener("resize", resize);
+    visualViewport?.addEventListener("scroll", resize);
+
     return () => {
+      resizeObserver.disconnect();
       window.removeEventListener("resize", resize);
+      window.removeEventListener("orientationchange", resize);
+      visualViewport?.removeEventListener("resize", resize);
+      visualViewport?.removeEventListener("scroll", resize);
       cancelAnimationFrame(rafId);
     };
   }, [draw, currentStroke, completedStrokes, tracingProgress, showCheck]);
@@ -228,6 +276,8 @@ function TracingCanvas({ item, onComplete }: Props) {
         width: "100%",
         height: "100%",
         touchAction: "none",
+        WebkitTouchCallout: "none",
+        WebkitUserSelect: "none",
         display: "block",
         outline: "none",
       }}
@@ -237,12 +287,11 @@ function TracingCanvas({ item, onComplete }: Props) {
       onBlur={(e) => {
         e.currentTarget.style.outline = "none";
       }}
-      onMouseDown={handleStart}
-      onMouseMove={handleMove}
-      onMouseUp={handleEnd}
-      onTouchStart={handleStart}
-      onTouchMove={handleMove}
-      onTouchEnd={handleEnd}
+      onPointerDown={handleStart}
+      onPointerMove={handleMove}
+      onPointerUp={handleEnd}
+      onPointerCancel={handleCancel}
+      onLostPointerCapture={handleCancel}
     />
   );
 }

@@ -35,6 +35,49 @@ npm run dev
 
 Open [http://localhost:5173](http://localhost:5173) in your browser.
 
+## Deployment
+
+The production base path defaults to `/kidtrace/`, which matches GitHub Pages project hosting.
+For a root-domain deployment, set `VITE_BASE_PATH=/` in `.env` before building, or run:
+
+```bash
+# macOS/Linux
+VITE_BASE_PATH=/ npm run build
+```
+
+For another subdirectory, include leading and trailing slashes:
+
+```bash
+# macOS/Linux
+VITE_BASE_PATH=/my-app/ npm run build
+```
+
+PowerShell examples:
+
+```powershell
+$env:VITE_BASE_PATH="/"; npm.cmd run build
+$env:VITE_BASE_PATH="/my-app/"; npm.cmd run build
+```
+
+The manifest and icons use base-aware paths, and the production build registers a small service
+worker that caches the app shell and same-origin app assets after first load. This gives installed
+PWA sessions a basic offline fallback without changing the development server behavior.
+
+## Browser Support
+
+KidTrace targets current evergreen desktop browsers, Android Chromium browsers, and iOS Safari
+16.4 or newer. The production build explicitly targets:
+
+- Chrome 107+
+- Edge 107+
+- Firefox 104+
+- Safari/iOS Safari 16.4+
+
+Older iOS Safari versions may still load the app, but they are not the supported baseline because
+viewport units, PWA behavior, pointer events, and speech synthesis are less consistent there.
+Speech feedback and installed PWA/offline behavior should be verified on real iPhone/iPad devices
+before release.
+
 ### Available Scripts
 
 | Script                 | Description                         |
