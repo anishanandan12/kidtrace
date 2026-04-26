@@ -63,6 +63,21 @@ The manifest and icons use base-aware paths, and the production build registers 
 worker that caches the app shell and same-origin app assets after first load. This gives installed
 PWA sessions a basic offline fallback without changing the development server behavior.
 
+## Browser Support
+
+KidTrace targets current evergreen desktop browsers, Android Chromium browsers, and iOS Safari
+16.4 or newer. The production build explicitly targets:
+
+- Chrome 107+
+- Edge 107+
+- Firefox 104+
+- Safari/iOS Safari 16.4+
+
+Older iOS Safari versions may still load the app, but they are not the supported baseline because
+viewport units, PWA behavior, pointer events, and speech synthesis are less consistent there.
+Speech feedback and installed PWA/offline behavior should be verified on real iPhone/iPad devices
+before release.
+
 ### Available Scripts
 
 | Script                 | Description                         |

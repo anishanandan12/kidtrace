@@ -329,6 +329,8 @@ Files:
 - `package.json`
 - `README.md`
 
+Status: implemented with an explicit Vite build/CSS target and README support matrix.
+
 Problems:
 
 - TypeScript targets `ES2023`.
@@ -413,4 +415,4 @@ Checklist:
 - [x] Add `pointercancel`/cancel handling for tracing.
 - [x] Clamp canvas DPR to avoid oversized iPad canvases.
 - [x] Wrap hover transforms in hover-capable media queries.
-- [ ] Document the minimum supported iOS Safari version.
+- [x] Document the minimum supported iOS Safari version.
