@@ -74,10 +74,9 @@ export function unlockSpeech(): void {
     prepareSpeech();
     if (speechUnlocked) return;
 
-    const utterance = new SpeechSynthesisUtterance(".");
+    const utterance = new SpeechSynthesisUtterance("Sound on");
     applyVoice(utterance);
-    utterance.volume = 0;
-    utterance.rate = 1;
+    utterance.rate = 0.9;
     window.speechSynthesis.speak(utterance);
     speechUnlocked = true;
   } catch {
