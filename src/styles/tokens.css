@@ -11,7 +11,8 @@
   --color-overlay: rgba(0, 0, 0, 0.35);
 
   /* Typography */
-  --font-family: "Arial Rounded MT Bold", Arial, sans-serif;
+  --font-family: "Arial Rounded MT Bold", "Avenir Next Rounded", "Nunito", system-ui,
+    -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
   /* Border radii */
   --radius-card: 28px;

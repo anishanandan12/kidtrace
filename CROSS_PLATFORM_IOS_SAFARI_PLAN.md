@@ -252,6 +252,8 @@ Files:
 - `src/pages/HomeScreen/index.css`
 - `src/pages/TracingScreen/index.module.css`
 
+Status: implemented with `@media (hover: hover) and (pointer: fine)` wrappers.
+
 Problems:
 
 - Mobile Safari can leave `:hover` styles active after tapping.
@@ -272,6 +274,8 @@ Files:
 
 - `src/pages/TracingScreen/index.module.css`
 - `src/components/CelebrationOverlay/index.tsx`
+
+Status: implemented in CSS with safe-area padding, card constraints, clamped sizing, scroll fallback, and wrapping actions.
 
 Problems:
 
@@ -295,6 +299,8 @@ Acceptance checks:
 Files:
 
 - `src/styles/tokens.css`
+
+Status: implemented with a broader rounded/system font fallback stack.
 
 Problems:
 
@@ -406,5 +412,5 @@ Checklist:
 - [x] Make completion UI independent from speech callbacks.
 - [x] Add `pointercancel`/cancel handling for tracing.
 - [x] Clamp canvas DPR to avoid oversized iPad canvases.
-- [ ] Wrap hover transforms in hover-capable media queries.
+- [x] Wrap hover transforms in hover-capable media queries.
 - [ ] Document the minimum supported iOS Safari version.
