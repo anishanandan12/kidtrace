@@ -17,9 +17,10 @@ const MAX_CANVAS_DPR = 2;
 interface Props {
   item: StrokeItem;
   onComplete: () => void;
+  onTraceStart?: () => void;
 }
 
-function TracingCanvas({ item, onComplete }: Props) {
+function TracingCanvas({ item, onComplete, onTraceStart }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lastItemRef = useRef<StrokeItem | null>(null);
   const activePointerIdRef = useRef<number | null>(null);
@@ -148,13 +149,14 @@ function TracingCanvas({ item, onComplete }: Props) {
       const startTol = Math.min(canvas.width, canvas.height) * 0.2;
       const d = Math.sqrt((pos.x - pts[0].x) ** 2 + (pos.y - pts[0].y) ** 2);
       if (d <= startTol) {
+        onTraceStart?.();
         activePointerIdRef.current = e.pointerId;
         canvas.setPointerCapture(e.pointerId);
         setIsTracing(true);
         setTracingProgress(0.02);
       }
     },
-    [item, canvasPos, getScale, allDone, showCheck, currentStroke],
+    [item, canvasPos, getScale, allDone, showCheck, currentStroke, onTraceStart],
   );
 
   const handleMove = useCallback(

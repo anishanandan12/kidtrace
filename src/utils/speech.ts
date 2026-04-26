@@ -3,6 +3,7 @@ let speechRunId = 0;
 let speechTimerId: number | null = null;
 let preferredVoice: SpeechSynthesisVoice | undefined;
 let listeningForVoices = false;
+let speechUnlocked = false;
 
 export const speechSupported =
   typeof window !== "undefined" &&
@@ -18,6 +19,20 @@ function getPreferredVoice(): SpeechSynthesisVoice | undefined {
     voices.find((voice) => voice.lang.toLowerCase().startsWith("en")) ??
     voices[0];
   return preferredVoice;
+}
+
+function applyVoice(utterance: SpeechSynthesisUtterance): void {
+  const voice = getPreferredVoice();
+  if (voice) {
+    utterance.voice = voice;
+    utterance.lang = voice.lang;
+  } else {
+    utterance.lang = "en-US";
+  }
+}
+
+function resumeSpeech(): void {
+  window.speechSynthesis.resume();
 }
 
 function clearSpeechTimer(): void {
@@ -40,6 +55,7 @@ export function prepareSpeech(): void {
   if (!speechSupported) return;
   try {
     getPreferredVoice();
+    resumeSpeech();
     if (!listeningForVoices) {
       listeningForVoices = true;
       window.speechSynthesis.addEventListener("voiceschanged", () => {
@@ -47,6 +63,23 @@ export function prepareSpeech(): void {
         getPreferredVoice();
       });
     }
+  } catch {
+    // Speech is optional.
+  }
+}
+
+export function unlockSpeech(): void {
+  if (!speechSupported) return;
+  try {
+    prepareSpeech();
+    if (speechUnlocked) return;
+
+    const utterance = new SpeechSynthesisUtterance(".");
+    applyVoice(utterance);
+    utterance.volume = 0;
+    utterance.rate = 1;
+    window.speechSynthesis.speak(utterance);
+    speechUnlocked = true;
   } catch {
     // Speech is optional.
   }
@@ -70,13 +103,10 @@ export function speakThen(phrase: string, onDone: () => void): void {
   }
   try {
     cancelSpeech();
+    resumeSpeech();
     const runId = speechRunId;
     const utterance = new SpeechSynthesisUtterance(phrase);
-    const voice = getPreferredVoice();
-    if (voice) {
-      utterance.voice = voice;
-      utterance.lang = voice.lang;
-    }
+    applyVoice(utterance);
     utterance.rate = 0.9;
 
     const finish = finishOnce(onDone, runId);
@@ -92,12 +122,9 @@ export function speakThen(phrase: string, onDone: () => void): void {
 export function speakWord(text: string): void {
   if (!speechSupported) return;
   try {
+    resumeSpeech();
     const utterance = new SpeechSynthesisUtterance(text);
-    const voice = getPreferredVoice();
-    if (voice) {
-      utterance.voice = voice;
-      utterance.lang = voice.lang;
-    }
+    applyVoice(utterance);
     utterance.rate = 0.8;
     window.speechSynthesis.speak(utterance);
   } catch {

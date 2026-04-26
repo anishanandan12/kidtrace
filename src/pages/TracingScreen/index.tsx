@@ -4,7 +4,7 @@ import CelebrationOverlay from "../../components/CelebrationOverlay";
 import type { StrokeItem } from "../../types";
 import styles from "./index.module.css";
 import LETTER_WORDS from "../../data/letterWords";
-import { cancelSpeech, prepareSpeech, speakThen, speakWord } from "../../utils/speech";
+import { cancelSpeech, prepareSpeech, speakThen, speakWord, unlockSpeech } from "../../utils/speech";
 
 const PRAISE = [
   "Amazing!",
@@ -74,7 +74,7 @@ export default function TracingScreen({
       </button>
 
       <div className={styles.canvasWrapper}>
-        <TracingCanvas key={key} item={item} onComplete={handleComplete} />
+        <TracingCanvas key={key} item={item} onComplete={handleComplete} onTraceStart={unlockSpeech} />
       </div>
 
       {done && (
