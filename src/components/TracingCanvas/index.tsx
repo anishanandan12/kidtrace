@@ -114,9 +114,12 @@ function TracingCanvas({ item, onComplete }: Props) {
   }, [draw, currentStroke, completedStrokes, tracingProgress, showCheck]);
 
   const canvasPos = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>, canvas: HTMLCanvasElement) => {
+    (
+      e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>,
+      canvas: HTMLCanvasElement,
+    ) => {
       const rect = canvas.getBoundingClientRect();
-      const src = "touches" in e ? e.touches[0] : e;
+      const src = "touches" in e ? (e.touches[0] ?? e.changedTouches[0]) : e;
       return {
         x: ((src.clientX - rect.left) / rect.width) * canvas.width,
         y: ((src.clientY - rect.top) / rect.height) * canvas.height,
@@ -228,8 +231,12 @@ function TracingCanvas({ item, onComplete }: Props) {
         display: "block",
         outline: "none",
       }}
-      onFocus={(e) => { (e.currentTarget.style.outline = "4px solid rgba(255,255,255,0.7)"); }}
-      onBlur={(e) => { (e.currentTarget.style.outline = "none"); }}
+      onFocus={(e) => {
+        e.currentTarget.style.outline = "4px solid rgba(255,255,255,0.7)";
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.outline = "none";
+      }}
       onMouseDown={handleStart}
       onMouseMove={handleMove}
       onMouseUp={handleEnd}
