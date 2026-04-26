@@ -1,24 +1,26 @@
 {
-  "id": "/kidtrace/",
+  "id": ".",
   "name": "KidTrace",
   "short_name": "KidTrace",
   "description": "Help kids learn letters, numbers, and shapes through fun tracing activities.",
-  "start_url": "/kidtrace/",
-  "scope": "/kidtrace/",
+  "start_url": ".",
+  "scope": ".",
   "display": "standalone",
-  "display_override": ["standalone"],
+  "display_override": ["standalone", "browser"],
   "orientation": "portrait",
+  "lang": "en",
+  "categories": ["education", "kids", "games"],
   "theme_color": "#4caf50",
   "background_color": "#4caf50",
   "icons": [
     {
-      "src": "/kidtrace/android-chrome-192x192.png",
+      "src": "android-chrome-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/kidtrace/android-chrome-512x512.png",
+      "src": "android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable any"

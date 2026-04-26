@@ -35,6 +35,34 @@ npm run dev
 
 Open [http://localhost:5173](http://localhost:5173) in your browser.
 
+## Deployment
+
+The production base path defaults to `/kidtrace/`, which matches GitHub Pages project hosting.
+For a root-domain deployment, set `VITE_BASE_PATH=/` in `.env` before building, or run:
+
+```bash
+# macOS/Linux
+VITE_BASE_PATH=/ npm run build
+```
+
+For another subdirectory, include leading and trailing slashes:
+
+```bash
+# macOS/Linux
+VITE_BASE_PATH=/my-app/ npm run build
+```
+
+PowerShell examples:
+
+```powershell
+$env:VITE_BASE_PATH="/"; npm.cmd run build
+$env:VITE_BASE_PATH="/my-app/"; npm.cmd run build
+```
+
+The manifest and icons use base-aware paths, and the production build registers a small service
+worker that caches the app shell and same-origin app assets after first load. This gives installed
+PWA sessions a basic offline fallback without changing the development server behavior.
+
 ### Available Scripts
 
 | Script                 | Description                         |

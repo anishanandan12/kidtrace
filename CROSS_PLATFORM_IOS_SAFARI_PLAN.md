@@ -10,7 +10,7 @@ KidTrace is already mostly mobile-oriented, but a few browser APIs and CSS choic
 - The tracing canvas uses separate mouse and touch handlers instead of a single pointer-event path with pointer capture.
 - Speech synthesis depends on `onend`/`onerror` callbacks, which can be unreliable on iOS Safari.
 - Canvas sizing only listens to `window.resize`, while iOS Safari often changes the visual viewport without a normal resize event.
-- PWA metadata is tied to the `/kidtrace/` base path and has limited iOS-specific install/offline handling.
+- PWA install/offline behavior still needs real-device verification, especially in iOS standalone mode.
 - Some UI states rely on hover behavior, which can feel sticky or inconsistent on touch browsers.
 
 ## Phase 1: Highest-Impact iOS Safari Fixes
@@ -172,7 +172,9 @@ Files:
 - `public/site.webmanifest`
 - `vite.config.ts`
 
-Problems:
+Status: implemented with `%BASE_URL%` HTML asset paths, relative manifest URLs, and `VITE_BASE_PATH`.
+
+Original problems:
 
 - Icons, manifest, `start_url`, and `scope` are hardcoded to `/kidtrace/`.
 - This is fine for GitHub Pages under `/kidtrace/`, but less portable for local previews, custom domains, or alternate deployments.
@@ -196,6 +198,8 @@ Files:
 
 - `public/site.webmanifest`
 - new service worker or Vite PWA integration
+
+Status: started with a small custom service worker for app-shell precache and same-scope runtime caching.
 
 Problems:
 
@@ -222,6 +226,8 @@ Files:
 - `index.html`
 - `public/site.webmanifest`
 - `public/`
+
+Status: partially implemented. Existing Apple tags remain, manifest metadata was expanded, and icon sizes were verified.
 
 Plan:
 
