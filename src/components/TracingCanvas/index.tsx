@@ -12,6 +12,7 @@ import { drawPill, drawDirectionDots, drawChevron, drawTraceTip } from "../../ut
 const ORANGE = "#F5A623";
 const GUIDE_COLOR = "rgba(0,0,0,0.22)";
 const COMPLETION_THRESHOLD = 0.85;
+const MAX_CANVAS_DPR = 2;
 
 interface Props {
   item: StrokeItem;
@@ -224,20 +225,43 @@ function TracingCanvas({ item, onComplete }: Props) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     let rafId = 0;
+
     const resize = () => {
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
-        const dpr = window.devicePixelRatio || 1;
+        const dpr = Math.min(window.devicePixelRatio || 1, MAX_CANVAS_DPR);
         const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
+        const nextWidth = Math.max(1, Math.round(rect.width * dpr));
+        const nextHeight = Math.max(1, Math.round(rect.height * dpr));
+
+        if (canvas.width !== nextWidth) {
+          canvas.width = nextWidth;
+        }
+        if (canvas.height !== nextHeight) {
+          canvas.height = nextHeight;
+        }
+
         draw(currentStroke, completedStrokes, tracingProgress, showCheck);
       });
     };
+
+    const observedElement = canvas.parentElement ?? canvas;
+    const resizeObserver = new ResizeObserver(resize);
+    const visualViewport = window.visualViewport;
+
+    resizeObserver.observe(observedElement);
     resize();
     window.addEventListener("resize", resize);
+    window.addEventListener("orientationchange", resize);
+    visualViewport?.addEventListener("resize", resize);
+    visualViewport?.addEventListener("scroll", resize);
+
     return () => {
+      resizeObserver.disconnect();
       window.removeEventListener("resize", resize);
+      window.removeEventListener("orientationchange", resize);
+      visualViewport?.removeEventListener("resize", resize);
+      visualViewport?.removeEventListener("scroll", resize);
       cancelAnimationFrame(rafId);
     };
   }, [draw, currentStroke, completedStrokes, tracingProgress, showCheck]);

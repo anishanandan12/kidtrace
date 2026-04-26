@@ -399,6 +399,6 @@ Checklist:
 - [x] Add additive safe-area spacing around fixed controls.
 - [x] Make completion UI independent from speech callbacks.
 - [x] Add `pointercancel`/cancel handling for tracing.
-- [ ] Clamp canvas DPR to avoid oversized iPad canvases.
+- [x] Clamp canvas DPR to avoid oversized iPad canvases.
 - [ ] Wrap hover transforms in hover-capable media queries.
 - [ ] Document the minimum supported iOS Safari version.
