@@ -1,5 +1,6 @@
 import React from "react";
 import type { Data } from "../../types";
+import { prepareSpeech } from "../../utils/speech";
 import "./index.css";
 
 const CATEGORIES: {
@@ -27,6 +28,7 @@ export default function HomeScreen({ onSelect }: { onSelect: (cat: keyof Data) =
             key={cat.id}
             className="category-card"
             style={{ "--card-color": cat.color } as React.CSSProperties}
+            onPointerDown={prepareSpeech}
             onClick={() => onSelect(cat.id)}
             aria-label={`Select ${cat.subtitle} category`}
           >

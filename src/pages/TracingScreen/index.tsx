@@ -4,7 +4,7 @@ import CelebrationOverlay from "../../components/CelebrationOverlay";
 import type { StrokeItem } from "../../types";
 import styles from "./index.module.css";
 import LETTER_WORDS from "../../data/letterWords";
-import { speechSupported, speakThen, speakWord } from "../../utils/speech";
+import { cancelSpeech, prepareSpeech, speakThen, speakWord } from "../../utils/speech";
 
 const PRAISE = [
   "Amazing!",
@@ -30,16 +30,17 @@ export default function TracingScreen({
   hasNext: boolean;
 }) {
   const [done, setDone] = useState(false);
-
-  useEffect(() => () => { if (speechSupported) window.speechSynthesis.cancel(); }, []);
   const [key, setKey] = useState(0);
+
+  useEffect(() => cancelSpeech, []);
 
   function handleComplete() {
     const praise = PRAISE[Math.floor(Math.random() * PRAISE.length)];
     const letterData = LETTER_WORDS[item.label];
-    // 1. Speak praise → 2. show overlay → 3. speak "A for Apple"
+
+    setDone(true);
+    prepareSpeech();
     speakThen(praise, () => {
-      setDone(true);
       if (letterData) {
         speakWord(`${item.label} for ${letterData.word}`);
       } else {
@@ -49,20 +50,27 @@ export default function TracingScreen({
   }
 
   function handleRetry() {
+    cancelSpeech();
     setDone(false);
     setKey((k) => k + 1);
   }
 
   function handleNext() {
+    cancelSpeech();
     setDone(false);
     setKey((k) => k + 1);
     onNext();
   }
 
+  function handleClose() {
+    cancelSpeech();
+    onClose();
+  }
+
   return (
     <div className={styles.tracingScreen}>
-      <button className={styles.closeBtn} onClick={onClose} aria-label="Close tracing screen">
-        ✕
+      <button className={styles.closeBtn} onClick={handleClose} aria-label="Close tracing screen">
+        &times;
       </button>
 
       <div className={styles.canvasWrapper}>
@@ -74,7 +82,7 @@ export default function TracingScreen({
           label={item.label}
           onRetry={handleRetry}
           onNext={handleNext}
-          onHome={onClose}
+          onHome={handleClose}
           hasNext={hasNext}
         />
       )}
