@@ -10,6 +10,10 @@ export const speechSupported =
   "speechSynthesis" in window &&
   "SpeechSynthesisUtterance" in window;
 
+export function hasUnlockedSpeech(): boolean {
+  return speechUnlocked;
+}
+
 function getPreferredVoice(): SpeechSynthesisVoice | undefined {
   if (!speechSupported) return undefined;
   if (preferredVoice) return preferredVoice;

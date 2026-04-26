@@ -6,6 +6,7 @@ import styles from "./index.module.css";
 import LETTER_WORDS from "../../data/letterWords";
 import {
   cancelSpeech,
+  hasUnlockedSpeech,
   prepareSpeech,
   speakThen,
   speakWord,
@@ -38,8 +39,7 @@ export default function TracingScreen({
 }) {
   const [done, setDone] = useState(false);
   const [key, setKey] = useState(0);
-  const [soundReady, setSoundReady] = useState(false);
-  const [soundPromptOpen, setSoundPromptOpen] = useState(speechSupported);
+  const [soundPromptOpen, setSoundPromptOpen] = useState(() => speechSupported && !hasUnlockedSpeech());
   const soundPromptButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => cancelSpeech, []);
@@ -52,11 +52,6 @@ export default function TracingScreen({
 
   function handleEnableSound() {
     unlockSpeech();
-    setSoundReady(true);
-    setSoundPromptOpen(false);
-  }
-
-  function handleSkipSound() {
     setSoundPromptOpen(false);
   }
 
@@ -95,47 +90,38 @@ export default function TracingScreen({
 
   return (
     <div className={styles.tracingScreen}>
-      <button className={styles.closeBtn} onClick={handleClose} aria-label="Close tracing screen">
-        &times;
-      </button>
-
       {!soundPromptOpen && (
-        <button
-          className={`${styles.soundBtn} ${soundReady ? styles.soundBtnReady : ""}`}
-          onClick={handleEnableSound}
-          aria-label={soundReady ? "Sound is on" : "Turn sound on"}
-          aria-pressed={soundReady}
-        >
-          {soundReady ? "Sound on" : "Sound"}
-        </button>
-      )}
+        <>
+          <button className={styles.closeBtn} onClick={handleClose} aria-label="Close tracing screen">
+            &times;
+          </button>
 
-      <div className={styles.canvasWrapper}>
-        <TracingCanvas key={key} item={item} onComplete={handleComplete} onTraceStart={handleEnableSound} />
-      </div>
+          <div className={styles.canvasWrapper}>
+            <TracingCanvas key={key} item={item} onComplete={handleComplete} />
+          </div>
 
-      {done && (
-        <CelebrationOverlay
-          label={item.label}
-          onRetry={handleRetry}
-          onNext={handleNext}
-          onHome={handleClose}
-          hasNext={hasNext}
-        />
+          {done && (
+            <CelebrationOverlay
+              label={item.label}
+              onRetry={handleRetry}
+              onNext={handleNext}
+              onHome={handleClose}
+              hasNext={hasNext}
+            />
+          )}
+        </>
       )}
 
       {soundPromptOpen && (
         <div className={styles.soundPromptOverlay} role="dialog" aria-modal="true" aria-labelledby="sound-title">
           <div className={styles.soundPromptCard}>
             <h2 id="sound-title" className={styles.soundPromptTitle}>
-              Sound on?
+              Turn on sound
             </h2>
+            <p className={styles.soundPromptText}>Tap play sound to start tracing with voice.</p>
             <div className={styles.soundPromptActions}>
               <button ref={soundPromptButtonRef} className={styles.soundPromptPrimary} onClick={handleEnableSound}>
-                Sound on
-              </button>
-              <button className={styles.soundPromptSecondary} onClick={handleSkipSound}>
-                Not now
+                Play sound
               </button>
             </div>
           </div>
